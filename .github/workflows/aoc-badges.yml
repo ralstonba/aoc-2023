@@ -1,0 +1,23 @@
+name: 🎄 Advent of Code Badges 🎄   # https://github.com/J0B10/aoc-badges-action
+on:
+  schedule:
+    - cron: '6 5 1-30 12 *'
+
+  workflow_dispatch:
+    push:
+      paths:
+        - '**/Day*.kt' # Only if the source code for a day was modified
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: joblo2213/aoc-badges-action@v3
+        with:
+          userid: ${{ secrets.AOC_USER_ID }}
+          session: ${{ secrets.AOC_SESSION }}
+          year: 2023
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: 🤖 Update badges
+          file_pattern: README.md
