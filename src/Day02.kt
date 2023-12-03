@@ -3,25 +3,23 @@ fun main() {
     data class Round(val red: Int, val green: Int, val blue: Int)
     data class Game(val number: Int, val rounds: List<Round>)
 
+    fun Round(input: String): Round {
+        // 8 green, 6 blue, 20 red
+        return input.split(", ")
+            .associate { colorCountPair ->
+                val (count: String, color: String) = colorCountPair.split(" ")
+                color to count.toInt()
+            }.let { Round(
+                it["red"] ?: 0,
+                it["green"] ?: 0,
+                it["blue"] ?: 0
+            ) }
+    }
+
     fun parseInput(input: String): Game {
         val number = "\\d+".toRegex().find(input)!!.value.toInt()
         val game = input.split(":").last().trim()
-        val rounds = game.split("; ").map {
-            val colors = it.split(", ")
-            var red = 0
-            var green = 0
-            var blue = 0
-            for (color in colors) {
-                if (color.contains("red")) {
-                    red = "\\d+".toRegex().find(color)!!.value.toInt()
-                } else if (color.contains("green")) {
-                    green = "\\d+".toRegex().find(color)!!.value.toInt()
-                } else {
-                    blue = "\\d+".toRegex().find(color)!!.value.toInt()
-                }
-            }
-            Round(red, green, blue)
-        }
+        val rounds = game.split("; ").map { Round(it) }
         return Game(number, rounds)
     }
 
@@ -36,17 +34,12 @@ fun main() {
 
     fun part2(input: List<String>): Int {
         return input.map { parseInput(it) }
-            .map { game ->
-                var r = 0
-                var g = 0
-                var b = 0
-                for (round in game.rounds) {
-                    r = r.coerceAtLeast(round.red)
-                    g = g.coerceAtLeast(round.green)
-                    b = b.coerceAtLeast(round.blue)
-                }
-                Round(r, g, b)
-            }.sumOf { it.red * it.green * it.blue }
+            .sumOf { g ->
+                val reds = g.rounds.maxOf { it.red }
+                val greens = g.rounds.maxOf { it.green }
+                val blues = g.rounds.maxOf { it.blue }
+                reds * greens * blues
+            }
     }
 
     // test if implementation meets criteria from the description, like:
