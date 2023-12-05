@@ -23,7 +23,34 @@ fun main() {
     }
 
     fun part2(input: List<String>): Int {
-        return input.size
+        val cards = input.map { parse(it) }
+            .associate { it.number to mutableListOf(it) }
+            .toMutableMap()
+
+        for (card in cards.keys) {
+            val numWins = cards[card]?.first()?.numberOfWinningNumbers() ?: 0
+            if (numWins > 0) {
+                for (j in 1..cards[card]?.size!!) {
+                    for (i in 1..numWins) {
+                        cards[card + i]?.add(cards[card]!!.first())
+                    }
+                }
+            }
+        }
+
+        return cards.values.flatten().count()
+
+//        for (idx in cards.indices) {
+//            if (cards[idx].numberOfWinningNumbers() > 0) {
+//                val cardsToAdd = mutableListOf<Card>()
+//                for (cnt in 1..cards[idx].numberOfWinningNumbers()) {
+//                    cardsToAdd.add(cards[idx + cnt])
+//                }
+//                cardsToAdd.forEachIndexed { index, card -> cards.add(idx + index + 1, card) }
+//            }
+//        }
+//
+//        return cards.count { it.numberOfWinningNumbers() > 0 }
     }
 
     // test if implementation meets criteria from the description, like:
@@ -37,7 +64,7 @@ fun main() {
     )
 
     check(part1(testInput) == 13)
-//    check(part2(testInput) == 2286)
+    check(part2(testInput) == 30)
 
     val input = readInput("day04")
     part1(input).println()
